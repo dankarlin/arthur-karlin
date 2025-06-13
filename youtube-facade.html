@@ -1,0 +1,204 @@
+<!-- YouTube Facade Component -->
+<style>
+.youtube-facade {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.youtube-facade:hover {
+    transform: scale(1.02);
+}
+
+.youtube-facade-thumbnail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.youtube-facade:hover .youtube-facade-thumbnail {
+    opacity: 0.9;
+}
+
+.youtube-facade-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 56px;
+    background: rgba(255, 0, 0, 0.9);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.youtube-facade:hover .youtube-facade-play {
+    background: rgba(255, 0, 0, 1);
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+.youtube-facade-play::before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 20px solid white;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    margin-left: 4px;
+}
+
+.youtube-facade-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 30px 20px 20px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.youtube-facade-duration {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .youtube-facade-play {
+        width: 60px;
+        height: 42px;
+    }
+    
+    .youtube-facade-play::before {
+        border-left: 15px solid white;
+        border-top: 9px solid transparent;
+        border-bottom: 9px solid transparent;
+    }
+    
+    .youtube-facade-title {
+        font-size: 1rem;
+        padding: 25px 15px 15px;
+    }
+}
+</style>
+
+<script>
+function createYouTubeFacade(videoId, title = 'Arthur Karlin Memorial Service', duration = '') {
+    const facade = document.createElement('div');
+    facade.className = 'youtube-facade';
+    facade.setAttribute('data-video-id', videoId);
+    facade.setAttribute('aria-label', `Play video: ${title}`);
+    facade.setAttribute('role', 'button');
+    facade.setAttribute('tabindex', '0');
+    
+    // Create thumbnail image with loading optimization
+    const thumbnail = document.createElement('img');
+    thumbnail.className = 'youtube-facade-thumbnail';
+    thumbnail.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    thumbnail.alt = title;
+    thumbnail.loading = 'lazy';
+    thumbnail.decoding = 'async';
+    
+    // Fallback to standard quality if maxres doesn't exist
+    thumbnail.onerror = function() {
+        this.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    };
+    
+    // Create play button
+    const playButton = document.createElement('div');
+    playButton.className = 'youtube-facade-play';
+    playButton.setAttribute('aria-hidden', 'true');
+    
+    // Create title overlay
+    const titleOverlay = document.createElement('div');
+    titleOverlay.className = 'youtube-facade-title';
+    titleOverlay.textContent = title;
+    
+    // Create duration badge if provided
+    if (duration) {
+        const durationBadge = document.createElement('div');
+        durationBadge.className = 'youtube-facade-duration';
+        durationBadge.textContent = duration;
+        facade.appendChild(durationBadge);
+    }
+    
+    // Assemble facade
+    facade.appendChild(thumbnail);
+    facade.appendChild(playButton);
+    facade.appendChild(titleOverlay);
+    
+    // Click handler to load actual YouTube iframe
+    function loadVideo() {
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        iframe.allowFullscreen = true;
+        iframe.title = title;
+        iframe.style.position = 'absolute';
+        iframe.style.top = '0';
+        iframe.style.left = '0';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        
+        // Replace facade with iframe
+        facade.parentNode.replaceChild(iframe, facade);
+        
+        // Track interaction for analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'video_play', {
+                'event_category': 'engagement',
+                'event_label': title,
+                'video_id': videoId
+            });
+        }
+    }
+    
+    // Event listeners
+    facade.addEventListener('click', loadVideo);
+    facade.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            loadVideo();
+        }
+    });
+    
+    return facade;
+}
+
+// Initialize facade on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    const videoContainer = document.querySelector('.video-container .ratio');
+    if (videoContainer) {
+        // Clear existing content
+        videoContainer.innerHTML = '';
+        
+        // Create and append facade
+        const facade = createYouTubeFacade('Se497gGgyPo', 'Arthur Karlin Memorial Service');
+        videoContainer.appendChild(facade);
+    }
+});
+</script>

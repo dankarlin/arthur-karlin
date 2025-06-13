@@ -13,20 +13,20 @@
     <meta property="og:url" content="https://arthur-karlin.com/">
     <meta property="og:title" content="In Memory of Arthur Karlin">
     <meta property="og:description" content="Memorial site for Arthur Karlin featuring memorial service program and video tribute">
-    <meta property="og:image" content="https://arthur-karlin.com/ak1.jpg">
+    <meta property="og:image" content="https://arthur-karlin.com/ak1.webp">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://arthur-karlin.com/">
     <meta property="twitter:title" content="In Memory of Arthur Karlin">
     <meta property="twitter:description" content="Memorial site for Arthur Karlin featuring memorial service program and video tribute">
-    <meta property="twitter:image" content="https://arthur-karlin.com/ak1.jpg">
+    <meta property="twitter:image" content="https://arthur-karlin.com/ak1.webp">
     
     <!-- Preload critical resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preload" href="ak1.jpg" as="image">
+    <link rel="preload" href="ak1.webp" as="image">
     
     <!-- Critical CSS inlined below to prevent render blocking -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&amp;display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -226,7 +226,10 @@
     <!-- Memorial Header -->
     <header class="memorial-header">
         <div class="container">
-            <img src="ak1.jpg" alt="Arthur Karlin portrait photo" class="memorial-photo" width="150" height="150" fetchpriority="high">
+            <picture>
+                <source srcset="ak1.webp" type="image/webp">
+                <img src="ak1.jpg" alt="Arthur Karlin portrait photo" class="memorial-photo" width="150" height="150" fetchpriority="high">
+            </picture>
             <h1 class="memorial-title">Arthur Karlin</h1>
             <p class="memorial-dates">In Loving Memory</p>
         </div>
@@ -256,16 +259,28 @@
                         </div>
                         <div class="carousel-inner">
                             <div class="carousel-item active">
-                                <img src="program_Page_1.png" class="d-block w-100" alt="Memorial service program cover page featuring Arthur Karlin's name and service details" loading="eager" width="800" height="1035">
+                                <picture>
+                                    <source srcset="program_Page_1.webp" type="image/webp">
+                                    <img src="program_Page_1.png" class="d-block w-100" alt="Memorial service program cover page featuring Arthur Karlin's name and service details" loading="eager" width="800" height="1035">
+                                </picture>
                             </div>
                             <div class="carousel-item">
-                                <img src="program_Page_2.png" class="d-block w-100" alt="Memorial service program page 2 with order of service and readings" loading="lazy" width="800" height="1035">
+                                <picture>
+                                    <source srcset="program_Page_2.webp" type="image/webp">
+                                    <img src="program_Page_2.png" class="d-block w-100" alt="Memorial service program page 2 with order of service and readings" loading="lazy" width="800" height="1035">
+                                </picture>
                             </div>
                             <div class="carousel-item">
-                                <img src="program_Page_3.png" class="d-block w-100" alt="Memorial service program page 3 with biographical information about Arthur Karlin" loading="lazy" width="800" height="1035">
+                                <picture>
+                                    <source srcset="program_Page_3.webp" type="image/webp">
+                                    <img src="program_Page_3.png" class="d-block w-100" alt="Memorial service program page 3 with biographical information about Arthur Karlin" loading="lazy" width="800" height="1035">
+                                </picture>
                             </div>
                             <div class="carousel-item">
-                                <img src="program_Page_4.png" class="d-block w-100" alt="Memorial service program back page with acknowledgments and final thoughts" loading="lazy" width="800" height="1035">
+                                <picture>
+                                    <source srcset="program_Page_4.webp" type="image/webp">
+                                    <img src="program_Page_4.png" class="d-block w-100" alt="Memorial service program back page with acknowledgments and final thoughts" loading="lazy" width="800" height="1035">
+                                </picture>
                             </div>
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#memorialCarousel"
@@ -293,12 +308,8 @@
                     </p>
                     
                     <div class="video-container">
-                        <div class="ratio ratio-16x9">
-                            <iframe src="https://www.youtube.com/embed/Se497gGgyPo?rel=0" 
-                                    allowfullscreen 
-                                    title="Arthur Karlin Memorial Service"
-                                    aria-label="Memorial service video for Arthur Karlin"
-                                    loading="lazy"></iframe>
+                        <div class="ratio ratio-16x9" id="youtube-video-container">
+                            <!-- YouTube facade will be inserted here by JavaScript -->
                         </div>
                     </div>
                 </div>
@@ -313,6 +324,9 @@
             <p>In memory of Arthur Karlin</p>
         </div>
     </footer>
+    <!-- YouTube Facade Implementation -->
+    <script src="youtube-facade.html"></script>
+    
     <!-- Load Bootstrap CSS and JS asynchronously -->
     <script>
         // Load Bootstrap CSS asynchronously
@@ -340,6 +354,71 @@
                     .catch(function(error) {
                         console.log('SW registration failed:', error);
                     });
+            }
+        });
+        
+        // Initialize YouTube facade
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoContainer = document.getElementById('youtube-video-container');
+            if (videoContainer) {
+                // Create YouTube facade
+                const facade = document.createElement('div');
+                facade.className = 'youtube-facade';
+                facade.style.cssText = `
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+                    border-radius: 10px;
+                    overflow: hidden;
+                    cursor: pointer;
+                    transition: transform 0.3s ease;
+                `;
+                
+                const thumbnail = document.createElement('img');
+                thumbnail.src = 'https://img.youtube.com/vi/Se497gGgyPo/maxresdefault.jpg';
+                thumbnail.alt = 'Arthur Karlin Memorial Service';
+                thumbnail.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    opacity: 0.8;
+                `;
+                thumbnail.loading = 'lazy';
+                
+                const playButton = document.createElement('div');
+                playButton.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 80px;
+                    height: 56px;
+                    background: rgba(255, 0, 0, 0.9);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                `;
+                playButton.innerHTML = '<div style="width: 0; height: 0; border-left: 20px solid white; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 4px;"></div>';
+                
+                facade.appendChild(thumbnail);
+                facade.appendChild(playButton);
+                
+                facade.addEventListener('click', function() {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = 'https://www.youtube.com/embed/Se497gGgyPo?autoplay=1&rel=0';
+                    iframe.allowFullscreen = true;
+                    iframe.title = 'Arthur Karlin Memorial Service';
+                    iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;';
+                    videoContainer.replaceChild(iframe, facade);
+                });
+                
+                videoContainer.appendChild(facade);
             }
         });
     </script>
